@@ -3,25 +3,9 @@
             [cljs.reader :refer [read-string]]
             [jayq.core :as jayq]
             [reagent.core :as re :refer [render-component atom]]
-            [alfa.reconfig :refer [conf]]))
-
-
-(defn selid
-  "Document getElementById shortened"
-  [id]
-  (.getElementById js/document id))
-
-(def anim-duration 1200)
-
-(defn animate
-  "Animate the content when popped up, to be applied when
-  performing any transition, elmt is the id of a certain html
-  element"
-  [elmt]
-  (.fadeIn js/Jacked (selid elmt)
-           (clj->js {:duration anim-duration})))
-
-(.initializeTouchEvents js/React true)
+            [alfa.reconfig :refer [conf]]
+            [alfa.db :as db]
+            [alfa.util :refer [selid animate]]))
 
 (defn comp-main-header
   "The main header for the app"
@@ -90,8 +74,6 @@
                         (selid "main"))
       (render-component [comp-word-list]
                         (selid "main-stuff"))))
-
-(start)
 
 
 
