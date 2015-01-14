@@ -1,0 +1,13 @@
+{"name" : "English SBMPTN part I",
+  "count" : 8,
+  "list" :
+  [{"word" : "Clojured" , "def" : "The state of being absorbed and obssessed with Clojure"},
+	{"word" : "Lisperated" , "def" : "The state of being constructed and influenced by lisp, usually a computer program"},
+	{"word" : "Clojurian" , "def" : "A person that codes with Clojure"},
+	{"word" : "Lisper" , "def" : "A person that codes in Lisp family of programming language"},
+	{"word" : "Racketeer" , "def" : "A person that codes in Racket programming language"},
+	{"word" : "Lispy" , "def" : "An adjective that pertains to anythng lisp"},
+	{"word" : "Clojurish" , "def" : "Pertaining to Clojure"},
+	{"word" : "Rackety" , "def" : "An adjective that pertains to racket"}]}
+
+
