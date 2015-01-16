@@ -5,7 +5,8 @@
                  [org.clojure/core.async "0.1.338.0-5c5012-alpha"]
                  [org.clojure/clojurescript "0.0-2511"]
                  [reagent "0.4.3"]
-                 [cljs-ajax "0.3.3"]
+                 [kioo "0.4.0"]
+                 [cljs-ajax "0.3.9"]
                  [com.taoensso/carmine "2.9.0"]
                  [jayq "2.5.2"]
                  [couchbase-clj "0.2.0"]]
@@ -16,8 +17,16 @@
                            :closure-warnings {:non-standard-jsdoc :off},
                            :output-to "resources/zenvocab/www/app.js",
                            :output-wrapper false,
-                           :optimizations :simple}}]}
-  
+                           :optimizations :simple}
+                :id "alfa"} 
+               {:source-paths ["src_zeneng"],
+                :compiler {:pretty-print     false,
+                           :closure-warnings {:non-standard-jsdoc :off},
+                           :output-to        "resources/public/app.js",
+                           :output-wrapper   false,
+                           :optimizations    :simple}
+                :id  "zeneng"}]}
+
   :url "http://example.com/FIXME"
   :main alfa.core
   :jvm-opts ["-server"]

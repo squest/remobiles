@@ -31,7 +31,7 @@
                     (do (render-component [nekat %]
                                           (selid "main"))
                         (animate "main")))]
-         (comp-menu-item
+          (comp-menu-item
            {:on-click     fns
             :on-touch-end fns
             :id           %}
@@ -63,17 +63,18 @@
 (defn start
   []
   (do (http/ajax-request
-        {:uri     "data/one.edn"
-         :method  :get
-         :handler (fn [[stat data]]
-                    (do (reset! word-list
-                                (:list data))
-                        (js/alert @word-list)))
-         :response-format (http/edn-response-format)})
+       {:uri     "data/one.edn"
+        :method  :get
+        :handler (fn [[stat data]]
+                   (do (reset! word-list
+                               (:list data))
+                       (js/alert @word-list)))
+        :response-format (http/edn-response-format)})
       (render-component [main-page]
                         (selid "main"))
       (render-component [comp-word-list]
                         (selid "main-stuff"))))
+
 
 
 
