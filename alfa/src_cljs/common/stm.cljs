@@ -1,10 +1,12 @@
 (ns common.stm
-	(:require [cljs.reader :refer [read-string]]
-						[ajax.core :as http]))
+	(:require
+		[cljs.reader :refer [read-string]]
+		[ajax.core :as http]))
 
 (defprotocol StateManagement
 	"Managing the state of the application"
 	(get-current-user [this] "Get the current user from the data")
+	(user-exists? [this user-map] "Check the existence of a particular user")
 	(all-users [this] "Get all available users in app")
 	(set-current-user! [this user-map] "Set the current user with provided user-map")
 	(add-user! [this user-map] "Add a new user to the system")
@@ -27,11 +29,18 @@
 		(let [{:keys [dbname]} this
 					data (.getItem js/localStorage (str dbname "/" "users"))]
 			(if data (read-string data) nil)))
+	;; TODO check the username and password against the data in zeniusnet
+	(user-exists? [this user-map]
+		(let [{:keys [dbname]} this
+					{:keys [username]} user-map
+					users-data (all-users this)]
+			(some #{username} (map :username users-data))))
 	(add-user! [this user-map]
 		(let [{:keys [dbname]} this
 					old-users (all-users this)]
-			(.setItem js/localStorage (str dbname "/users")
-								(conj old-users user-map))))
+			(->> (assoc user-map :answer 0 :correct 0)
+					 (conj old-users)
+					 (.setItem js/localStorage (str dbname "/users")))))
 	(init-drills! [this available-drills]
 		(let [{:keys [dbname]} this]
 			(doseq [drill available-drills]
@@ -94,7 +103,9 @@
 		(:users @this))
 	(add-user! [this user-map]
 		(let [old-users (all-users this)]
-			(swap! this assoc :users (conj old-users user-map))))
+			(->> (assoc user-map :answer 0 :correct 0)
+					 (conj old-users)
+					 (swap! this assoc :users))))
 	(init-drills! [this available-drills]
 		(let [{:keys [database available-drills]} @this]
 			(swap! this assoc :drills (get-drills database available-drills))))
@@ -104,6 +115,14 @@
 		(get (:drills @this) which-drill?))
 	(set-current-drill! [this which-drill?]
 		(swap! this assoc :current-drill (get-drill this which-drill?))))
+
+(defn make-app-state
+	[reatom]
+	(AppState. reatom))
+
+(defn make-local-storage
+	[dbname]
+	(LocalStorage. dbname))
 
 
 
