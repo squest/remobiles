@@ -19,12 +19,13 @@
     (do (user/save! username password)
         (doseq [item ["one" "two" "three"]]
           (ajax-request
-           {:uri (str "data/" item ".edn")
+           {:uri (str "dato/" item ".edn")
             :method :get
             :response-format (edn-response-format)
             :handler
             (fn [[_ data]]
-              (db/set-item! (str "word-list-" item) data))}))
+              (do (db/set-item! (str "word-list-" item) data)
+                  data))}))
         (main-page))))
 
 (defn launch-app
@@ -71,14 +72,13 @@
   []
   (do (.initializeTouchEvents js/React true)
       (if (user/exists?)
-        (launch-app) 
+        (launch-app)
         (do (render-component [header "Zenius Vocab App"]
                               (selid "header"))
             (render-component [comp-login]
                               (selid "container"))
             (animate "menu-container")))))
 
-(start)
 
 
 

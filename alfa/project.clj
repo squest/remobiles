@@ -9,7 +9,8 @@
                  [cljs-ajax "0.3.9"]
                  [com.taoensso/carmine "2.9.0"]
                  [jayq "2.5.2"]
-                 [couchbase-clj "0.2.0"]]
+                 [couchbase-clj "0.2.0"]
+                 [reagent/reagent-cursor "0.1.2"]]
   
   :cljsbuild {:builds
               [{:source-paths ["src_cljs"],
@@ -38,3 +39,4 @@
             [lein-autoexpect "1.4.2"]]
   :description "FIXME: write description"
   :min-lein-version "2.0.0")
+

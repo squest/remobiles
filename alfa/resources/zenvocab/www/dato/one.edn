@@ -1,0 +1,14 @@
+{:name "SBMPTN I"
+ :list [{:word "Jika" :def "Maka"}
+        {:word "Adalah" :def "Dialan"}
+        {:word "Aasddalah" :def "Dialewran"}
+        {:word "Adalsdaah" :def "Diawerlan"}
+        {:word "Adaldsfah" :def "Dialweran"}
+        {:word "Adasdflah" :def "Dialan"}
+        {:word "Adalsdfah" :def "Dialweran"}
+        {:word "Adsdfalah" :def "Dialwerwan"}
+        {:word "Adasdflah" :def "Diasdflan"}
+        {:word "Adasdflah" :def "Dialxvcan"}
+        {:word "Adsdfalah" :def "Dialxcvan"}
+        {:word "Addsfalah" :def "Dialxcan"}
+        {:word "Adalsdfah" :def "Dsdfvbialan"}]}

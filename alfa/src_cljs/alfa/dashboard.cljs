@@ -3,6 +3,7 @@
             [alfa.db :as db]
             [ajax.core :as http]
             [jayq.core :as jayq]
+            [alfa.quiz :as quiz]
             [alfa.util :refer [selid animate]]))
 
 (def word-list
@@ -16,11 +17,13 @@
          :zenius false}))
 
 (defn drill-set
-  "The component for each drill-set menu"
-  [drill-name]
+  "The componet for each drill-set menu"
+  [drill-name idx]
   (list [:div {:class "item item-divider"}
          drill-name]
-        [:a {:class "item"}
+        [:a {:class "item"
+             :on-click (fn [e]
+                         (quiz/quiz-init idx))}
          "Test yourself"]
         [:a {:class "item"}
          "Browse flash-card"]))
@@ -30,8 +33,8 @@
   [menus]
   [:div
    (repeat 3 [:br])
-   (->> menus
-        (map drill-set)
+   (->> [menus (range 1 4)]
+        (apply map #(drill-set %1 %2))
         (concat [:div {:class "list"}])
         vec)])
 
