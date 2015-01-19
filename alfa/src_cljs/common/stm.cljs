@@ -4,8 +4,8 @@
 		[ajax.core :as http]))
 
 (defprotocol StateManagement
-	"Managing the state of the application"
 	(get-current-user [this] "Get the current user from the data")
+	(get-user [this user-map] "Get a particular user data")
 	(user-exists? [this user-map] "Check the existence of a particular user")
 	(all-users [this] "Get all available users in app")
 	(set-current-user! [this user-map] "Set the current user with provided user-map")
@@ -14,6 +14,9 @@
 	(get-drills [this available-drills] "Get the available drills")
 	(get-drill [this which-drill?] "Get the specific drill")
 	(set-current-drill! [this which-drill?] "Set the current drill"))
+
+(defprotocol Cursoring
+	(curs [this]))
 
 (defrecord Database [dbname]
 	StateManagement
@@ -28,13 +31,18 @@
 	(all-users [this]
 		(let [{:keys [dbname]} this
 					data (.getItem js/localStorage (str dbname "/" "users"))]
-			(if data (read-string data) nil)))
+			(if data (read-string data) [])))
 	;; TODO check the username and password against the data in zeniusnet
 	(user-exists? [this user-map]
 		(let [{:keys [dbname]} this
 					{:keys [username]} user-map
 					users-data (all-users this)]
 			(some #{username} (map :username users-data))))
+	(get-user [this user-map]
+		(let [{:keys [username]} user-map
+					users-data (all-users this)]
+			(first (filter #(= username (:username %))
+										 users-data))))
 	(add-user! [this user-map]
 		(let [{:keys [dbname]} this
 					old-users (all-users this)]
@@ -64,65 +72,42 @@
 			(.setItem js/localStorage (str dbname "/current-drill")
 								(get-drill this which-drill?)))))
 
-(defrecord AppState [reatom]
+(defrecord AppState [ratname]
 	StateManagement
 	(get-current-user [this]
-		(let [{:keys [reatom]} this]
-			(:current-user @reatom)))
+		(:current-user @(:ratname this)))
 	(set-current-user! [this user-map]
-		(let [{:keys [reatom]} this]
-			(swap! reatom assoc :current-user user-map)))
+		(swap! (:ratname this) assoc :current-user user-map))
 	(all-users [this]
-		(let [{:keys [reatom]} this]
-			(:users @reatom)))
-	(add-user! [this user-map]
-		(let [{:keys [reatom]} this
-					old-users (all-users this)]
-			(swap! reatom assoc :users (conj old-users user-map))))
-	(init-drills! [this available-drills]
-		(let [{:keys [reatom]} this
-					{:keys [database available-drills]} @reatom]
-			(swap! reatom assoc :drills (get-drills database available-drills))))
-	(get-drills [this available-drills]
-		(let [{:keys [reatom]} this]
-			(:drills @reatom)))
-	(get-drill [this which-drill?]
-		(let [{:keys [reatom]} this]
-			(get (:drills @reatom) which-drill?)))
-	(set-current-drill! [this which-drill?]
-		(let [{:keys [reatom]} this]
-			(swap! reatom assoc :current-drill (get-drill this which-drill?)))))
-
-(extend-type reagent.core/atom
-	StateManagement
-	(get-current-user [this]
-		(:current-user @this))
-	(set-current-user! [this user-map]
-		(swap! this assoc :current-user user-map))
-	(all-users [this]
-		(:users @this))
+		(:users @(:ratname this)))
 	(add-user! [this user-map]
 		(let [old-users (all-users this)]
 			(->> (assoc user-map :answer 0 :correct 0)
 					 (conj old-users)
-					 (swap! this assoc :users))))
+					 (swap! (:ratname this) assoc :users))))
 	(init-drills! [this available-drills]
-		(let [{:keys [database available-drills]} @this]
-			(swap! this assoc :drills (get-drills database available-drills))))
+		(let [{:keys [ratname]} this
+					{:keys [database]} @ratname]
+			(swap! ratname assoc :drills (get-drills database available-drills))))
 	(get-drills [this available-drills]
-		(:drills @this))
+		(:drills @(:ratname this)))
 	(get-drill [this which-drill?]
-		(get (:drills @this) which-drill?))
+		(get (:drills @(:ratname this)) which-drill?))
 	(set-current-drill! [this which-drill?]
-		(swap! this assoc :current-drill (get-drill this which-drill?))))
+		(swap! (:ratname this) assoc :current-drill
+					 (get-drill this which-drill?)))
+	Cursoring
+	(curs [this]
+		(:ratname this)))
 
 (defn make-app-state
-	[reatom]
-	(AppState. reatom))
+	[reagent-atom]
+	(AppState. reagent-atom))
+
 
 (defn make-local-storage
 	[dbname]
-	(LocalStorage. dbname))
+	(Database. dbname))
 
 
 
