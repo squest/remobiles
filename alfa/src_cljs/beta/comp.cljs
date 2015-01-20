@@ -1,10 +1,11 @@
 (ns beta.comp
   (:require
-   [reagent.core :refer [atom render-component]]
-   [reagent.cursor :refer [cur]]
-   [common.stm :as stm]
-   [common.util :refer [selid animate]]
-   [beta.navigation :refer [set-page!]]))
+    [reagent.core :refer [atom render-component]]
+    [reagent.cursor :refer [cur]]
+    [common.stm :as stm]
+    [common.util :refer [selid animate]]
+    [beta.navigation :refer [set-page!]]
+    [beta.quiz :as quiz]))
 
 (defn page-drills
   [app]
@@ -14,7 +15,7 @@
           (let [code (.-id (.-target e))]
             (do (stm/set-current-drill! app code)
                 (set-page! app :quiz))))]
-    [:div (repeat 3 [:br])
+    [:div
      [:ul {:class "list"}
       (map #(vector :li
                     {:class "item"
@@ -27,30 +28,32 @@
 (defn page-account
   [app]
   (let [user (stm/get-current-user app)]
-    [:div (repeat 3 [:br])
-     [:div
-      [:h1 "This is the account"]
+    [:div
+     [:div {:class "app-content"}
+      [:h3 "This is the account"]
       [:br]
       [:p (str "Existing user : "
                (:username user))]]]))
 
 (defn page-zenius
   [app]
-  [:div (repeat 3 [:br])
-   [:h1 "This is the zenius"]])
+  [:div {:class "app-content"}
+   [:h3 "This is the zenius"]])
 
 (defn page-quiz
   [app]
-  [:div (repeat 3 [:br])
-   [:h1 "This is the drill quiz"]
-   [:ul {:class "list"}
-    (map #(vector :li {:class "item"}
-                  (:word %))
-         (:list (stm/get-current-drill app)))]])
+  (let [current-drill
+        (:list (stm/get-current-drill app))]
+    [:div {:class "app-content"}
+     [:h3 "This is the drill quiz"]
+     [:ul {:class "list"}
+      (map #(vector :li {:class "item"}
+                    (:word %))
+           (:list (stm/get-current-drill app)))]]))
 
 (defn page-flash-card
   [app]
-  [:div (repeat 3 [:br])
+  [:div
    [:h1 "This is the drill flash"]])
 
 (defn main-page
@@ -91,18 +94,19 @@
         [:div {:class "bar bar-header bar-positive app-header"}
          [:h3 {:class "title"}
           "Zenius Vocab App"]]]
-       (cond (= @current-page :drills)
-             (page-drills app)
-             (= @current-page :account)
-             (page-account app)
-             (= @current-page :zenius)
-             (page-zenius app)
-             (= @current-page :quiz)
-             (page-quiz app)
-             (= @current-page :flash-card)
-             (page-flash-card app)
-             :else [:div (repeat 3 [:br])
-                    [:h1 "Kagak ada apa apaan"]])
+       [:div {:class "app-page"}
+        (cond (= @current-page :drills)
+              (page-drills app)
+              (= @current-page :account)
+              (page-account app)
+              (= @current-page :zenius)
+              (page-zenius app)
+              (= @current-page :quiz)
+              (page-quiz app)
+              (= @current-page :flash-card)
+              (page-flash-card app)
+              :else [:div (repeat 3 [:br])
+                     [:h1 "Kagak ada apa apaan"]])]
        [:div {:class "tabs-striped tabs-color-positive"}
         [:div {:class "tabs app-footer"}
          [:a {:class        (:drills @tab-class)

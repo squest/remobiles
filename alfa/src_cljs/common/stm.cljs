@@ -1,8 +1,8 @@
 (ns common.stm
   (:require
-   [cljs.reader :refer [read-string]]
-   [ajax.core :as http]
-   [reagent.ratom :as ratom]))
+    [cljs.reader :refer [read-string]]
+    [ajax.core :as http]
+    [reagent.ratom :as ratom]))
 
 (defprotocol IStateManagement
   "State management of the application, especially managing users and
@@ -18,6 +18,11 @@
   (get-drill [this which-drill?] "Get the specific drill")
   (set-current-drill! [this which-drill?] "Set the current drill")
   (get-current-drill [this]))
+
+(defprotocol IDrills
+  "Managing the drills and user scores"
+  (get-user-score [this])
+  (update-user-score! [this answer]))
 
 (defrecord Database [dbname]
   IStateManagement
@@ -57,13 +62,13 @@
     (let [{:keys [dbname]} this]
       (doseq [drill available-drills]
         (http/ajax-request
-         {:uri             (str "data/" drill ".edn")
-          :method          :get
-          :response-format (http/edn-response-format)
-          :handler         (fn [[_ data]]
-                             (.setItem js/localStorage
-                                       (str dbname "/drills/" drill)
-                                       data))}))))
+          {:uri             (str "data/" drill ".edn")
+           :method          :get
+           :response-format (http/edn-response-format)
+           :handler         (fn [[_ data]]
+                              (.setItem js/localStorage
+                                        (str dbname "/drills/" drill)
+                                        data))}))))
   (get-drill [this which-drill?]
     (let [{:keys [dbname]} this
           data (.getItem js/localStorage (str dbname "/drills/" which-drill?))]
@@ -73,38 +78,51 @@
   (set-current-drill! [this which-drill?]
     (let [{:keys [dbname]} this]
       (.setItem js/localStorage (str dbname "/current-drill")
-                (get-drill this which-drill?)))))
+                (get-drill this which-drill?))))
+  IDrills
+  (get-user-score [this]
+    (let [{:keys [answer correct]}
+          (get-current-user this)]
+      (str correct "/" answer)))
+  (update-user-score! [this answer]
+    (let [user (get-current-user this)]
+      (->> (if answer
+             {:answer 1 :correct 1}
+             {:answer 1 :correct 0})
+           (merge-with + user)
+           (set-current-user! this)))))
 
 (defprotocol IConfig
   (set-available-drills! [this conf]))
 
 (extend-type ratom/RAtom
+  IDrills
+  (get-user-score [this]
+    (let [{:keys [answer correct]}
+          (get-current-user this)]
+      (str correct "/" answer)))
+  (update-user-score! [this answer]
+    (do (update-user-score! (:database @this) answer)
+        (set-current-user! this)
+        (get-current-user this)))
   IStateManagement
   (get-current-user [this]
     (:current-user @this))
   (set-current-user! [this]
     (->> (get-current-user (:database @this))
          (swap! this assoc :current-user)))
-  (all-users [this]
-    (:users @this))
-  (add-user! [this user-map]
-    (let [old-users (all-users this)]
-      (->> (assoc user-map :answer 0 :correct 0)
-           (conj old-users)
-           (swap! this assoc :users))))
-  (init-drills! [this available-drills]
-    (let [{:keys [database]} @this]
-      (->> (get-drills database available-drills)
-           (swap! this assoc :drills))))
-  (get-drills [this]
-    (:drills @this))
   (get-drill [this which-drill?]
-    (nth (:drills @this)
-         (condp = which-drill?
-           "one" 0 "two" 1 "three" 2)))
+    (-> (:database @this)
+        (get-drill which-drill?)))
   (set-current-drill! [this which-drill?]
     (->> (get-drill this which-drill?)
          (swap! this assoc :current-drill)))
+  (get-drills [this]
+    (:drills @this))
+  (init-drills! [this available-drills]
+    (->> (get-drills (:database @this) available-drills)
+         (map #(select-keys % [:name :code]))
+         (swap! this assoc :drills)))
   (get-current-drill [this]
     (:current-drill @this))
   IConfig
