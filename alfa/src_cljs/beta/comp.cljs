@@ -3,67 +3,89 @@
 		[reagent.core :refer [atom render-component]]
 		[reagent.cursor :refer [cur]]
 		[common.stm :as stm]
-		[common.util :refer [selid animate]]))
+		[common.util :refer [selid animate]]
+		[beta.navigation :refer [set-page!]]))
 
 (defn page-drills
 	[app]
-	[:div (repeat 3 [:br])
-	 [:ul {:class "list"}
-		(map #(vector :li
-									{:class "item"}
-									(:name %))
-				 (vals (:drills @app)))]])
+	(let [drills (cur app [:drills])
+				what-to-do-when-user-click-item
+				(fn [e]
+					(let [code (.-id (.-target e))]
+						(do (stm/set-current-drill! app code)
+								(set-page! app :quiz)
+								(js/alert (:current-drill @app)))))]
+		[:div (repeat 3 [:br])
+		 [:ul {:class "list"}
+			(map #(vector :li
+										{:class "item"
+										 :id (:code %)
+										 :on-click what-to-do-when-user-click-item
+										 :on-touch-end what-to-do-when-user-click-item}
+										(:name %))
+					 @drills)]]))
 
 (defn page-account
 	[app]
-	[:div (repeat 3 [:br])
-	 [:div {:id "anim"}
-		[:h1 "This is the account"]]])
+	(let [user (stm/get-current-user app)]
+		[:div (repeat 3 [:br])
+		 [:div
+			[:h1 "This is the account"]
+			[:br]
+			[:p (str "Existing user : "
+							 (:username user))]]]))
 
 (defn page-zenius
 	[app]
-	[:div [:h1 "This is the zenius"]])
+	[:div (repeat 3 [:br])
+	 [:h1 "This is the zenius"]])
 
 (defn page-quiz
 	[app]
-	[:div [:h1 "This is the drill quiz"]])
+	[:div (repeat 3 [:br])
+	 [:h1 "This is the drill quiz"]
+	 [:ul {:class "list"}
+		(map #(vector :li {:class "item"}
+									(:word %))
+				 (:list (stm/get-current-drill app)))]])
 
 (defn page-flash-card
 	[app]
-	[:div [:h1 "This is the drill flash"]])
+	[:div (repeat 3 [:br])
+	 [:h1 "This is the drill flash"]])
 
 (defn main-page
+	"This is the main-page component, consisting of header, page-container, and a footer"
 	[app]
 	(let [current-page (cur app [:current-page])
-				drills (cur app [:drills])
+				;; the tab-class is the state of class for footer
 				tab-class (atom {:drills "tab-item active"
 												 :account "tab-item"
 												 :zenius "tab-item"})
+				;; These tab-clicks functions are used to manage the state of the click
+				;; and determine whether the icon would be striped
 				tab-drill-click
 				(fn [e]
-					(do (reset! current-page :drills)
+					(do (set-page! app :drills)
 							(reset! tab-class
 											{:drills "tab-item active"
 											 :account "tab-item"
 											 :zenius "tab-item"})
-							(animate "main")
-							(js/alert (:name (first (:drills @app))))))
+							(js/console.log (:drills @app))))
 				tab-account-click
 				(fn [e]
-					(do (reset! current-page :account)
+					(do (set-page! app :account)
 							(reset! tab-class
 											{:drills "tab-item"
 											 :account "tab-item active"
-											 :zenius "tab-item"})
-							(animate "main")))
+											 :zenius "tab-item"})))
 				tab-zenius-click
 				(fn [e]
-					(do (reset! current-page :zenius)
+					(do (set-page! app :zenius)
 							(reset! tab-class
 											{:drills "tab-item"
 											 :account "tab-item"
-											 :zenius "tab-item active"})
-							(animate "main")))]
+											 :zenius "tab-item active"})))]
 		(fn []
 			[:div
 			 [:div {:class "tabs-striped tabs-top"}

@@ -7,10 +7,11 @@
 (ajax-request
  {:uri "/woli"
   :method :post
-  :params {:name "well"}
+  :params {:name "well" :mati-lu "Well mati dehh"}
   :format (edn-request-format)
   :response-format (edn-response-format)
   :handler (fn [[status data]]
                (do (js/alert status)
-                   (.log js/console data)))})
+                   (.log js/console data)
+                   (js/alert (:name data))))})
 

@@ -10,6 +10,8 @@
                  [com.taoensso/carmine "2.9.0"]
                  [jayq "2.5.2"]
                  [couchbase-clj "0.2.0"]
+                 [org.immutant/immutant "2.0.0-beta1"]
+                 [fogus/ring-edn "0.2.0"]
                  [reagent/reagent-cursor "0.1.2"]]
   
   :cljsbuild {:builds

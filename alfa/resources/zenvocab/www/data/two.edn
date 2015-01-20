@@ -1,16 +1,17 @@
 {:name "TPA SBMPTN II"
- :list {:word "Mangkus" :def "Efisien"
-				:word "Sangkil" :def "Efektif"
-				:word "Anarkis" :def "Kondisi tanpa kepemimpinan"
-				:word "Demosi" :def "Penurunan jabatan atau posisi"
-				:word "Mutasi" :def "Perubahan atau perpindahan"
-				:word "Radikal" :def "Bersifat mengakar"
-				:word "Konvolusi" :def "Bersifat mencampuradukan sesuatu"
-				:word "Tautan" :def "Referensi ke suatu laman (biasanya untuk website)"
-				:word "Nirmakna" :def "Tanpa suatu arti"
-				:word "Waralaba" :def "Bentuk kerjasama dimana sistem sudah disediakan untuk investor"
-				:word "Apropriasi" :def "Bentuk peruntukan menggunakan hibah"
-				:word "Delusi" :def "Memercayai suatu hal yang kemungkinan besar salah"
-				:word "Persistensi" :def "Bersifat menetap atau tahan lama"
-				:word "Pretensi" :def "Memiliki persepsi tertentu terhadap suatu hal"
-				:word "Tendensi" :def "Kecenderungan"}}
+ :code "two"
+ :list [{:word "Mangkus" :def "Efisien"}
+				{:word "Sangkil" :def "Efektif"}
+				{:word "Anarkis" :def "Kondisi tanpa kepemimpinan"}
+				{:word "Demosi" :def "Penurunan jabatan atau posisi"}
+				{:word "Mutasi" :def "Perubahan atau perpindahan"}
+				{:word "Radikal" :def "Bersifat mengakar"}
+				{:word "Konvolusi" :def "Bersifat mencampuradukan sesuatu"}
+				{:word "Tautan" :def "Referensi ke suatu laman (biasanya untuk website)"}
+				{:word "Nirmakna" :def "Tanpa suatu arti"}
+				{:word "Waralaba" :def "Bentuk kerjasama dimana sistem sudah disediakan untuk investor"}
+				{:word "Apropriasi" :def "Bentuk peruntukan menggunakan hibah"}
+				{:word "Delusi" :def "Memercayai suatu hal yang kemungkinan besar salah"}
+				{:word "Persistensi" :def "Bersifat menetap atau tahan lama"}
+				{:word "Pretensi" :def "Memiliki persepsi tertentu terhadap suatu hal"}
+				{:word "Tendensi" :def "Kecenderungan"}]}

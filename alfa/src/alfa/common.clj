@@ -1,30 +1,33 @@
 (ns alfa.common)
 
-(defprotocol Database
-  (get-item [this k])
-  (get-items [this ks])
-  (put-item [this k value])
-  (put-items [this kvals])
-  (find-item [this query])
-  (find-items [this query])
-  (remove-item! [this k])
-  (remove-items! [this ks])
-  (create-db! [this name])
-  (destroy-db! [this name]))
+(defprotocol ICode
+	(reverse-print [seqable])
+	(ngawur [seqable]))
 
-(defprotocol Shape
-  "Set of operations for geometric objects"
-  (area [this]
-    "Returns the area of a specific shape")
-  (perimeter [this]
-    "Returns the perimeter of a shape"))
+(extend-type String
+	ICode
+	(reverse-print [some-string]
+		(apply str (reverse some-string)))
+	(ngawur [this]
+		(str this " what???")))
 
-(defrecord Rectangle [length width]
-  Shape
-  (area [this]
-    (let [{:keys [length width]} this]
-      (* length width)))
-  (perimeter [this]
-    (let [{:keys [length width]} this]
-      (* 2 (+ length width)))))
+(extend-type clojure.lang.Seqable
+	ICode
+	(reverse-print [seqable]
+		(->> (str seqable)
+				 reverse
+				 (apply str)))
+	(ngawur [seqable]
+		(conj seqable " whaat?? ")))
 
+(defrecord Person [first-name last-name]
+	ICode
+	(reverse-print [this]
+		(str (:last-name this) (:first-name this)))
+	(ngawur [this]
+		(str (:first-name this) " whoo??")))
+
+(deftype Animal [species]
+	ICode
+	(reverse-print [this]
+		(apply str (reverse (.species this)))))
