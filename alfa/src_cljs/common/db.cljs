@@ -2,8 +2,7 @@
   (:require [cljs.reader :refer [read-string]]))
 
 (defn make-random
-  "Generate a random uuid in string format"
-  []
+  "Generate a random uuid in string format" []
   (let [r (repeatedly 30 (fn [] (.toString (rand-int 16) 16)))]
     (apply str (concat (take 8 r) ["-"]
                        (take 4 (drop 8 r)) ["-4"]
@@ -171,6 +170,8 @@
 (defn make-local-storage
   [dbname]
   (LocalStorage. dbname))
+
+
 
 
 

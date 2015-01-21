@@ -1,13 +1,13 @@
 (ns beta.init
   "Mainly functions to initialize the app"
   (:require
-    [reagent.core :as re :refer [atom render-component]]
-    [common.util :as util :refer [selid animate]]
-    [reagent.cursor :as rec :refer [cur]]
-    [common.config :refer [config]]
-    [beta.comp :as bcomp :refer [main-page]]
-    [common.stm :as stm :refer [local-database]]
-    [beta.navigation :as navi :refer [set-page!]]))
+   [reagent.core :as re :refer [atom render-component]]
+   [common.util :as util :refer [selid animate]]
+   [reagent.cursor :as rec :refer [cur]]
+   [common.config :refer [config]]
+   [beta.comp :as bcomp :refer [main-page]]
+   [common.stm :as stm :refer [local-database]]
+   [beta.navigation :as navi :refer [set-page!]]))
 
 (defn mount-app
   "If there exist a current user, then we can just mount the app"
@@ -70,12 +70,12 @@
         [:input {:type        "text"
                  :placeholder "username di zeniusnet"
                  :on-change   (fn [e] (swap! user assoc :username
-                                             (.-value (.-target e))))}]]
+                                            (.-value (.-target e))))}]]
        [:label {:class "item item-input"}
         [:input {:type        "password"
                  :placeholder "password di zeniusnet"
                  :on-change   (fn [e] (swap! user assoc :password
-                                             (.-value (.-target e))))}]]]]
+                                            (.-value (.-target e))))}]]]]
      (repeat 2 [:br])
      [:div {:class "row"}
       [:div {:class "col col-25"}]
@@ -85,15 +85,15 @@
        "Login"]]]))
 
 (defn launch-login
-  "Launch the login page, and determine whether to init app or simply mount the app based on user existence in the
-  database"
-  [app]
+  "Launch the login page, and determine whether to init app or simply
+  mount the app based on user existence in the database" [app]
   (render-component [comp-login app]
                     (selid "main")))
 
 (defn start
-  "Start the application, no in-memory data yet, thus an empty state, but we can check whether data exist in
-	localstorage, if data exist in database then we need to mount them into app-state."
+  "Start the application, no in-memory data yet, thus an empty state,
+	but we can check whether data exist in localstorage, if data
+	exist in database then we need to mount them into app-state."
   [app conf which-profile?]
   (do ;; Initialize the database
     (->> (which-profile? conf)
@@ -102,8 +102,9 @@
          (swap! app assoc :database))
     ;; Initialize available drills from conf
     (stm/set-available-drills! app conf)
-    ;; Check whether there exist a current user in database, if exist then just mount the app
-    ;; Otherwise we need to initialize the app by generating necessary data into database
+    ;; Check whether there exist a current user in database, if exist
+    ;; then just mount the app Otherwise we need to initialize the app
+    ;; by generating necessary data into database
     (let [dbase (:database @app)
           current-user (stm/get-current-user dbase)]
       (if current-user
@@ -112,7 +113,7 @@
 
 (def app-state (atom {}))
 
-(start app-state config :test)
+(start app-state config :development)
 
 
 

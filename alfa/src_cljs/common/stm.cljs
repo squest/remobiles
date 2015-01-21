@@ -1,28 +1,53 @@
 (ns common.stm
   (:require
-    [cljs.reader :refer [read-string]]
-    [ajax.core :as http]
-    [reagent.ratom :as ratom]))
+   [cljs.reader :refer [read-string]]
+   [ajax.core :as http]
+   [reagent.ratom :as ratom]))
 
 (defprotocol IStateManagement
   "State management of the application, especially managing users and
   available drills"
-  (get-current-user [this] "Get the current user from the data")
-  (get-user [this user-map] "Get a particular user data")
-  (user-exists? [this user-map] "Check the existence of a particular user")
-  (all-users [this] "Get all available users in app")
-  (set-current-user! [this] [this user-map] "Set the current user with provided user-map")
-  (add-user! [this user-map] "Add a new user to the system")
-  (init-drills! [this available-drills] "Initialise the app by mounting the current drills")
-  (get-drills [this] [this available-drills] "Get the available drills")
-  (get-drill [this which-drill?] "Get the specific drill")
-  (set-current-drill! [this which-drill?] "Set the current drill")
-  (get-current-drill [this]))
+  (get-current-user
+    [this]
+    "Get the current user from the data")
+  (get-user
+    [this user-map]
+    "Get a particular user data")
+  (user-exists?
+    [this user-map]
+    "Check the existence of a particular user")
+  (all-users
+    [this]
+    "Get all available users in app")
+  (set-current-user!
+    [this]
+    [this user-map]
+    "Set the current user with provided user-map")
+  (add-user!
+    [this user-map]
+    "Add a new user to the system")
+  (init-drills!
+    [this available-drills]
+    "Initialise the app by mounting the current drills")
+  (get-drills
+    [this]
+    [this available-drills]
+    "Get the available drills")
+  (get-drill
+    [this which-drill?]
+    "Get the specific drill")
+  (set-current-drill!
+    [this which-drill?]
+    "Set the current drill"))
 
 (defprotocol IDrills
   "Managing the drills and user scores"
-  (get-user-score [this])
-  (update-user-score! [this answer]))
+  (get-user-score
+    [this]
+    "Returns the string of user's total answers and correct answers")
+  (update-user-score!
+    [this answer]
+    "Update the user score depending of his/her answer"))
 
 (defrecord Database [dbname]
   IStateManagement
@@ -34,8 +59,7 @@
   (set-current-user! [this user-map]
     (let [{:keys [dbname]} this]
       (.setItem js/localStorage
-                (str dbname "/" "current-user")
-                user-map)))
+                (str dbname "/" "current-user") user-map)))
   (all-users [this]
     (let [{:keys [dbname]} this
           data (.getItem js/localStorage (str dbname "/" "users"))]
@@ -61,17 +85,17 @@
   (init-drills! [this available-drills]
     (let [{:keys [dbname]} this]
       (doseq [drill available-drills]
-        (http/ajax-request
-          {:uri             (str "data/" drill ".edn")
-           :method          :get
-           :response-format (http/edn-response-format)
-           :handler         (fn [[_ data]]
-                              (.setItem js/localStorage
-                                        (str dbname "/drills/" drill)
-                                        data))}))))
+        (http/ajax-request {:uri (str "data/" drill ".edn")
+                            :method          :get
+                            :response-format (http/edn-response-format)
+                            :handler         (fn [[_ data]]
+                                               (.setItem js/localStorage
+                                                         (str dbname "/drills/" drill)
+                                                         data))}))))
   (get-drill [this which-drill?]
-    (let [{:keys [dbname]} this
-          data (.getItem js/localStorage (str dbname "/drills/" which-drill?))]
+    (let [{:keys [dbname]} this data (->> (str dbname "/drills/"
+                                               which-drill?)
+                                          (.getItem js/localStorage))]
       (if data (read-string data) nil)))
   (get-drills [this available-drills]
     (map #(get-drill this %) available-drills))
@@ -93,6 +117,8 @@
            (set-current-user! this)))))
 
 (defprotocol IConfig
+  "This one simply a set of methods for manipulating app-state in-lieu
+  of config"
   (set-available-drills! [this conf]))
 
 (extend-type ratom/RAtom
@@ -123,17 +149,19 @@
     (->> (get-drills (:database @this) available-drills)
          (map #(select-keys % [:name :code]))
          (swap! this assoc :drills)))
-  (get-current-drill [this]
-    (:current-drill @this))
   IConfig
   (set-available-drills! [this conf]
     (let [drills (:available-drills conf)]
       (swap! this assoc :available-drills drills))))
 
 (defn local-database
-  "A constructor for local storage database, essentially creating a keyspace for the intended data"
-  [dbname]
+  "A constructor for local storage database,
+  essentially creating a keyspace for the intended data" [dbname]
   (Database. dbname))
+
+
+
+
 
 
 
