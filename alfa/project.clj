@@ -37,7 +37,7 @@
             [codox "0.8.10"]
             [lein-expectations "0.0.8"]
             [lein-environ "1.0.0"]
-            [lein-cljsbuild "1.0.3"]
+            [lein-cljsbuild "1.0.4"]
             [lein-autoexpect "1.4.2"]]
   :description "FIXME: write description"
   :min-lein-version "2.0.0")
